@@ -8,6 +8,8 @@ security=0
 
 echo "Wprowadź adres URL: "
 read URL
+echo $URL
+
 
 #1. Sprawdzenie czy strona jest szyfrowana
 #Jeśli jest szyfrowana to zmienna security zwiąksza się o 1
@@ -45,18 +47,22 @@ https://www.gkpge.pl/
 https://pgnig.pl/
 https://www.revolut.com/pl-PL/
 https://www.tauron.pl/dla-domu
-https://www.tesla.com/pl_pl)
-##echo $baza_bezpieczna[3]
+https://www.tesla.com/pl_pl
+)
 
 element_tablicy=1
-echo $baza_bezpieczna[$element_tablicy]
+#echo $baza_bezpieczna[$element_tablicy]
 
+
+for element_tablicy in $(seq 1 ${#baza_bezpieczna[*]});
+do
 if [ "$URL" == "$baza_bezpieczna[$element_tablicy" ]; then
         echo "Strona jest w bazie bezpiecznych adresów"
         let security=$security+1
 else
         echo "Zagrożenie - nie ma strony w bazie bezpiecznych adresów"
 fi
+done
 
 echo $security
 
@@ -73,7 +79,7 @@ fi
 
 echo $security
 
-#4. Sprawdzanie czy w URL występuje ".ru lub
+#4. Sprawdzanie czy w URL występuje ".ru
 
 ru=".ru"
 
@@ -104,7 +110,7 @@ echo $security
 URLskrocony=${URL#*.};
 echo $URLskrocony
 #whois=whois ${URLskrocony}
-#echo $whois
+#echo $whois >> wyniki
 echo | whois ${URLskrocony}
 echo "Czy uważasz, że informacje podane powyżej świadczą o tym, że strona jest bezpieczna?"
 echo "Jeśli tak, wciśniej T, jeśli nie, wciśnij N "
@@ -126,10 +132,13 @@ echo $security
 let wspolczynnik=($security*100/6)
 echo $wspolczynnik "% - współczynnik bezpieczeństwa strony"
 
-if [[ $wspolczynnik > 50 ]]; then
+if [[ $wspolczynnik > 70 ]]; then
         echo "Strona bezpieczna - interpretacja końcowa"
         let security=$security+1
 else
-        echo "Strona niebezpieczna - ocena whois"
+        echo "Strona niebezpieczna - interpretacja końcowa"
 fi
 
+echo "domain: " $URL >> wyniki
+let phishing_estimate=100-$wspolczynnik
+echo "phishing_estimate:" $phishing_estimate >> wyniki
